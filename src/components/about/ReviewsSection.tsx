@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
-import { useUser, type UserReview } from '@/context/usercontext';
+import { useUser, type UserReview } from '@/context/userContext';
 import { MENU_ITEMS } from '@/data/menu';
 
 export default function ReviewsSection() {
