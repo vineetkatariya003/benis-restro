@@ -1,0 +1,8 @@
+# Benis Restro SEO
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://benis-restro-h7y9.vercel.app/sitemap.xml

@@ -1,18 +1,18 @@
 import Navbar from '@/components/common/Navbar';
 import Footer from '@/components/common/Footer';
-import MenuPage from '@/components/menu/MenuPage';
+import MenuPageComponent from '@/components/menu/MenuPage';
 
 export const metadata = {
-  title: 'Menu - Benis Restro | Premium Vegetarian Cuisine',
-  description: 'Browse our complete menu of premium vegetarian dishes with real-time filtering and search.',
+  title: 'Menu - Benis Restro',
+  description: 'Browse our full menu of premium vegetarian dishes.',
 };
 
-export default function Menu() {
+export default function MenuPage() {
   return (
-    <div>
+    <>
       <Navbar />
-      <MenuPage />
+      <MenuPageComponent />
       <Footer />
-    </div>
+    </>
   );
 }

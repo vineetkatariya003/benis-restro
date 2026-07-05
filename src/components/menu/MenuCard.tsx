@@ -1,10 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
+import { useCart } from '@/context/cartContext';
+import type { CartItem } from '@/data/orders';
 
 export interface MenuCardProps {
-  index: number;
+  index?: number;
   id: string;
   name: string;
   description: string;
@@ -19,7 +22,6 @@ export interface MenuCardProps {
 }
 
 export default function MenuCard({
-  index,
   id,
   name,
   description,
@@ -30,14 +32,22 @@ export default function MenuCard({
   isSpecial = false,
   preparationTime = 15,
   servings = 'Serves 1',
-  onAddToCart,
 }: MenuCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    const total = price * quantity;
-    onAddToCart(id, name, total);
+    const cartItem: CartItem = {
+      id,
+      name,
+      price,
+      quantity,
+      image,
+      category,
+    };
+    addToCart(cartItem);
+    alert(`${name} x${quantity} added to cart!`);
     setQuantity(1);
   };
 
@@ -62,12 +72,11 @@ export default function MenuCard({
           height: '240px',
         }}
       >
-        <img
+        <Image
           src={image}
           alt={name}
+          fill
           style={{
-            width: '100%',
-            height: '100%',
             objectFit: 'cover',
             transition: `transform ${TRANSITIONS.base}`,
             transform: isHovered ? 'scale(1.05)' : 'scale(1)',

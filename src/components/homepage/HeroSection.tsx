@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
+import OffersCarousel from '@/components/offers/OffersCarousel';
+import FlashSales from '@/components/offers/FlashSales';
 
 export default function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -271,3 +273,10 @@ useEffect(() => {
     </section>
   );
 }
+{/* Offers Carousel */}
+      <div style={{ padding: `${SPACING['4xl']} ${SPACING.xl}`, backgroundColor: COLORS.bg.secondary }}>
+        <OffersCarousel />
+      </div>
+
+      {/* Flash Sales */}
+      <FlashSales />

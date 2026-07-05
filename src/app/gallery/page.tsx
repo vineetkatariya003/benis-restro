@@ -1,18 +1,18 @@
 import Navbar from '@/components/common/Navbar';
 import Footer from '@/components/common/Footer';
-import GalleryPage from '@/components/gallery/GalleryPage';
+import GalleryPageComponent from '@/components/gallery/GalleryPage';
 
 export const metadata = {
-  title: 'Gallery - Benis Restro | Restaurant Photos',
-  description: 'Explore our gallery featuring restaurant ambiance, signature dishes, our talented team, and special events.',
+  title: 'Gallery - Benis Restro',
+  description: 'Explore beautiful photos of our restaurant, dishes, and ambiance.',
 };
 
-export default function Gallery() {
+export default function GalleryPage() {
   return (
-    <div>
+    <>
       <Navbar />
-      <GalleryPage />
+      <GalleryPageComponent />
       <Footer />
-    </div>
+    </>
   );
 }

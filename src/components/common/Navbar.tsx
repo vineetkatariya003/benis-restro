@@ -1,20 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
+import CartIcon from './CartIcon';
+import CartSidebar from '@/components/cart/CartSidebar';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const navLinks = [
     { label: 'Home', href: '/' },
@@ -25,16 +18,21 @@ export default function Navbar() {
   ];
 
   return (
-    <nav
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
-        backgroundColor: isScrolled ? COLORS.bg.primary : COLORS.bg.primary,
-        boxShadow: isScrolled ? SHADOWS.md : 'none',
-        transition: `all ${TRANSITIONS.base}`,
-      }}
-    >
+    <>
+   <nav
+  suppressHydrationWarning
+  style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: `${SPACING.lg} ${SPACING.xl}`,
+    backgroundColor: COLORS.bg.primary,
+    boxShadow: SHADOWS.md,
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+  }}
+>
       <div
         style={{
           maxWidth: '1400px',
@@ -101,6 +99,7 @@ export default function Navbar() {
         </div>
 
         {/* Reservation Button */}
+        <CartIcon />
         <Link href="/booking" style={{ textDecoration: 'none' }}>
           <button
             style={{
@@ -221,5 +220,7 @@ export default function Navbar() {
         }
       `}</style>
     </nav>
+    <CartSidebar />
+    </>
   );
 }
