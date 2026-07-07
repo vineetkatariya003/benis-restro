@@ -250,7 +250,7 @@ export default function MenuCard({
     onAddToCart(id, name, price);
   }}
   style={{
-    width: '100%',
+    width: '10%',
     padding: SPACING.lg,
     backgroundColor: COLORS.primary.emerald,
     color: COLORS.text.inverse,
@@ -261,7 +261,6 @@ export default function MenuCard({
     transition: `all 0.3s`,
   }}
 >
-  ➕ Add to Cart
 </button>
           </button>
         </div>

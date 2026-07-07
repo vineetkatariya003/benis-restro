@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import { useCart } from '@/context/cartContext';
@@ -8,6 +8,16 @@ import { useCart } from '@/context/cartContext';
 export default function CartIcon() {
   const { cartItems } = useCart();
   const [isOpen, setIsOpen] = useState(false);
+  const [isBrowser, setIsBrowser] = useState(false);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setIsBrowser(true), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  if (!isBrowser) {
+    return <div style={{ width: '24px', height: '24px' }} />;
+  }
 
   return (
     <div>
@@ -48,88 +58,98 @@ export default function CartIcon() {
         )}
       </button>
 
-      {/* Cart Sidebar - Only show if open */}
+      {/* Cart Sidebar */}
       {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            right: 0,
-            top: 0,
-            height: '100vh',
-            width: '100%',
-            maxWidth: '400px',
-            backgroundColor: COLORS.bg.primary,
-            boxShadow: SHADOWS.xl,
-            zIndex: 1000,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {/* Close Button */}
-          <button
-            onClick={() => setIsOpen(false)}
+        <>
+          <div
             style={{
-              position: 'absolute',
-              top: SPACING.lg,
-              right: SPACING.lg,
-              backgroundColor: 'transparent',
-              border: 'none',
-              fontSize: '24px',
-              cursor: 'pointer',
-              zIndex: 1001,
+              position: 'fixed',
+              right: 0,
+              top: 0,
+              height: '100vh',
+              width: '100%',
+              maxWidth: '400px',
+              backgroundColor: COLORS.bg.primary,
+              boxShadow: SHADOWS.xl,
+              zIndex: 1000,
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            ✕
-          </button>
+            {/* Close Button */}
+            <button
+              onClick={() => setIsOpen(false)}
+              style={{
+                position: 'absolute',
+                top: SPACING.lg,
+                right: SPACING.lg,
+                backgroundColor: 'transparent',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                zIndex: 1001,
+              }}
+            >
+              ✕
+            </button>
 
-          <h2 style={{ padding: SPACING.lg, margin: 0 }}>🛒 Cart</h2>
+            <h2 style={{ padding: SPACING.lg, margin: 0 }}>🛒 Cart</h2>
 
-          {cartItems.length === 0 ? (
-            <p style={{ textAlign: 'center', padding: SPACING.lg }}>
-              Your cart is empty
-            </p>
-          ) : (
-            <>
-              <div style={{ flex: 1, overflowY: 'auto', padding: SPACING.lg }}>
-                {cartItems.map(item => (
-                  <div key={item.id} style={{ marginBottom: SPACING.lg, borderBottom: `1px solid #e5e7eb` }}>
-                    <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>{item.name}</p>
-                    <p style={{ margin: 0, fontSize: '14px' }}>₹{item.total}</p>
-                  </div>
-                ))}
-              </div>
-              
-              <Link href="/checkout" style={{ textDecoration: 'none' }}>
-                <button
-                  style={{
-                    width: '100%',
-                    padding: SPACING.lg,
-                    backgroundColor: COLORS.primary.emerald,
-                    color: 'white',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  Go to Checkout
-                </button>
-              </Link>
-            </>
-          )}
-        </div>
-      )}
+            {cartItems.length === 0 ? (
+              <p style={{ textAlign: 'center', padding: SPACING.lg }}>
+                Your cart is empty
+              </p>
+            ) : (
+              <>
+                <div style={{ flex: 1, overflowY: 'auto', padding: SPACING.lg }}>
+                  {cartItems.map(item => (
+                    <div
+                      key={item.id}
+                      style={{
+                        marginBottom: SPACING.lg,
+                        borderBottom: '1px solid #e5e7eb',
+                      }}
+                    >
+                      <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>
+                        {item.name}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '14px' }}>
+                        ₹{item.total}
+                      </p>
+                    </div>
+                  ))}
+                </div>
 
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          onClick={() => setIsOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 999,
-          }}
-        />
+                <Link href="/checkout" style={{ textDecoration: 'none' }}>
+                  <button
+                    style={{
+                      width: '100%',
+                      padding: SPACING.lg,
+                      backgroundColor: COLORS.primary.emerald,
+                      color: 'white',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    Go to Checkout
+                  </button>
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Overlay */}
+          <div
+            onClick={() => setIsOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              zIndex: 999,
+            }}
+          />
+        </>
       )}
     </div>
   );

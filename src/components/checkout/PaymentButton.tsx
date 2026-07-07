@@ -88,72 +88,85 @@ export default function PaymentButton({
   }, []);
 
   const handlePayment = async () => {
-    if (!selectedMethod) {
-      alert('Please select a payment method');
+  if (!selectedMethod) {
+    alert('Please select a payment method');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // Cash on Delivery - No real payment needed
+    if (selectedMethod === 'cod') {
+      console.log('💵 Cash on Delivery selected');
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const codPaymentId = `COD_${Date.now()}`;
+      
+      alert(`✅ ORDER CONFIRMED!\n\nPayment Method: Cash on Delivery\nAmount: ₹${amount}\nOrder ID: ${orderId}\n\nOur driver will collect payment at delivery.`);
+      
+      onPaymentSuccess(codPaymentId);
+      setLoading(false);
       return;
     }
 
+    // Real Razorpay for other methods
     if (!scriptLoaded || !window.Razorpay) {
       alert('Payment gateway is loading. Please wait...');
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-      
-      if (!keyId) {
-        alert('❌ Razorpay key is not configured');
-        setLoading(false);
-        return;
-      }
-
-      console.log('💳 Opening Razorpay checkout...');
-      console.log('Key ID:', keyId);
-
-      const options = {
-        key: keyId,
-        amount: Math.round(amount * 100), // Convert to paise
-        currency: 'INR',
-        name: 'Benis Restro',
-        description: `Order #${orderId}`,
-        prefill: {
-          name: customerName,
-          email: customerEmail,
-          contact: customerPhone,
-        },
-        theme: {
-          color: '#10B981',
-        },
-       handler: function (response: { razorpay_payment_id: string }) {
-  console.log('✅ Payment successful!');
-  console.log('Payment ID:', response.razorpay_payment_id);
-  
-  alert(`✅ PAYMENT SUCCESSFUL!\n\nPayment ID: ${response.razorpay_payment_id}\nOrder: ${orderId}\n\nThank you for your order!`);
-  
-  onPaymentSuccess(response.razorpay_payment_id);
-  setLoading(false);
-},
-        modal: {
-         ondismiss: function () {
-  console.log('❌ Payment cancelled by user');
-  alert('Payment cancelled');
-  onPaymentFailed();
-  setLoading(false);
-}, 
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    } catch (error) {
-      console.error('❌ Payment error:', error);
-      alert(`❌ Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      onPaymentFailed();
+    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    
+    if (!keyId) {
+      alert('❌ Razorpay key is not configured');
       setLoading(false);
+      return;
     }
-  };
+
+    console.log('💳 Opening Razorpay checkout...');
+
+    const options = {
+      key: keyId,
+      amount: Math.round(amount * 100),
+      currency: 'INR',
+      name: 'Benis Restro',
+      description: `Order #${orderId}`,
+      prefill: {
+        name: customerName,
+        email: customerEmail,
+        contact: customerPhone,
+      },
+      theme: {
+        color: '#10B981',
+      },
+      handler: function (response: { razorpay_payment_id: string }) {
+        console.log('✅ Payment successful!');
+        alert(`✅ PAYMENT SUCCESSFUL!\n\nPayment ID: ${response.razorpay_payment_id}\nOrder: ${orderId}\n\nThank you for your order!`);
+        onPaymentSuccess(response.razorpay_payment_id);
+        setLoading(false);
+      },
+      modal: {
+        ondismiss: function () {
+          console.log('❌ Payment cancelled');
+          alert('Payment cancelled');
+          onPaymentFailed();
+          setLoading(false);
+        },
+      },
+    };
+
+    const razorpay = new window.Razorpay(options);
+    razorpay.open();
+  } catch (error) {
+    console.error('❌ Error:', error);
+    alert(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    onPaymentFailed();
+    setLoading(false);
+  }
+};
 
   return (
     <div

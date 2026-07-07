@@ -32,7 +32,7 @@ export const PAYMENT_METHODS = [
   { id: 'upi', name: 'UPI', icon: '📱' },
   { id: 'card', name: 'Credit/Debit Card', icon: '💳' },
   { id: 'netbanking', name: 'Net Banking', icon: '🏦' },
-  { id: 'wallet', name: 'Wallets', icon: '👛' },
+  { id: 'cod', name: 'Cash on Delivery', icon: '💵' },
 ];
 
 export const RAZORPAY_SCRIPT = 'https://checkout.razorpay.com/v1/checkout.js';
