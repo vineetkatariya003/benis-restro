@@ -7,8 +7,25 @@ import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors
 import { useCart } from '@/context/cartContext';
 import Link from 'next/link';
 
+interface Order {
+  id: string;
+  orderNumber: string;
+  status: string;
+  items: { quantity: number }[];
+  total: number;
+  estimatedDelivery: string;
+  deliveryAddress: string;
+  city: string;
+  createdAt: string;
+}
+
+interface CartContextType {
+  orders?: Order[];
+}
+
 export default function OrdersPage() {
-  const { orders } = useCart();
+  const cartContext = useCart();
+  const orders = (cartContext as CartContextType | undefined)?.orders ?? [];
 
   return (
     <>

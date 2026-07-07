@@ -1,9 +1,9 @@
-'use client';
+ 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
 import { FEATURED_ITEMS } from '@/data/menu';
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 
 interface DishCardProps {
   name: string;
@@ -28,7 +28,7 @@ function DishCard({ name, description, price, image, isSpecial, index = 0 }: Dis
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
-        transition: `all ${TRANSITIONS.slow}`,
+        transition: `all ${'0.3s'}`,
         position: 'relative',
       }}
     >
@@ -40,7 +40,7 @@ function DishCard({ name, description, price, image, isSpecial, index = 0 }: Dis
           border: `1px solid rgba(255, 255, 255, 0.2)`,
           overflow: 'hidden',
           cursor: 'pointer',
-          transition: `all ${TRANSITIONS.base}`,
+          transition: `all ${'0.3s'}`,
           boxShadow: SHADOWS.glass,
           height: '100%',
           display: 'flex',
@@ -66,7 +66,7 @@ function DishCard({ name, description, price, image, isSpecial, index = 0 }: Dis
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              transition: `transform ${TRANSITIONS.base}`,
+              transition: `transform ${'0.3s'}`,
               transform: isHovered ? 'scale(1.1)' : 'scale(1)',
             }}
           />
@@ -99,7 +99,7 @@ function DishCard({ name, description, price, image, isSpecial, index = 0 }: Dis
               backgroundColor: isHovered
                 ? `rgba(16, 185, 129, 0.1)`
                 : 'rgba(0, 0, 0, 0)',
-              transition: `background-color ${TRANSITIONS.base}`,
+              transition: `background-color ${'0.3s'}`,
             }}
           />
         </div>
@@ -166,7 +166,7 @@ function DishCard({ name, description, price, image, isSpecial, index = 0 }: Dis
                   fontSize: TYPOGRAPHY.sizes.xs,
                   fontWeight: TYPOGRAPHY.weights.semibold,
                   cursor: 'pointer',
-                  transition: `all ${TRANSITIONS.base}`,
+                  transition: `all ${'0.3s'}`,
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = COLORS.primary.emerald_dark;
@@ -261,7 +261,7 @@ export default function FeaturedDishes() {
                 fontSize: TYPOGRAPHY.sizes.base,
                 fontWeight: TYPOGRAPHY.weights.semibold,
                 cursor: 'pointer',
-                transition: `all ${TRANSITIONS.base}`,
+                transition: `all ${'0.3s'}`,
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = COLORS.primary.emerald;

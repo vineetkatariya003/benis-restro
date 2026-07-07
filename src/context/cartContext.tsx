@@ -1,75 +1,82 @@
-// src/context/cartContext.tsx
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { CartItem, Order, generateOrderNumber, calculateEstimatedDelivery } from '@/data/orders';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  total: number;
+  notes?: string;
+}
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (item: CartItem) => void;
+  addToCart: (id: string, name: string, price: number, quantity: number, notes: string) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  cartCount: number;
-  cartTotal: number;
-  orders: Order[];
-  addOrder: (order: Omit<Order, 'id' | 'orderNumber' | 'createdAt' | 'estimatedDelivery'>) => Order;
-  getOrderById: (id: string) => Order | undefined;
-  isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
+  getCartTotal: () => number;
+  cartTotal: number; // ADD THIS LINE
 }
+
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'benis_restro_cart';
-const ORDERS_STORAGE_KEY = 'benis_restro_orders';
-
-const getInitialCartItems = (): CartItem[] => {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-    return savedCart ? JSON.parse(savedCart) : [];
-  } catch (error) {
-    console.error('Error loading cart:', error);
-    return [];
-  }
-};
-
-const getInitialOrders = (): Order[] => {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const savedOrders = localStorage.getItem(ORDERS_STORAGE_KEY);
-    return savedOrders ? JSON.parse(savedOrders) : [];
-  } catch (error) {
-    console.error('Error loading orders:', error);
-    return [];
-  }
-};
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [cartItems, setCartItems] = useState<CartItem[]>(getInitialCartItems);
-  const [orders, setOrders] = useState<Order[]>(getInitialOrders);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(CART_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error('Error loading cart:', error);
+      return [];
+    }
+  });
+  const isInitialMount = useRef(true);
 
-  // Load from localStorage on mount (CLIENT SIDE ONLY)
+  // Save to localStorage when items change, skip the first render
   useEffect(() => {
-    // Initial state is already loaded via getInitialCartItems and getInitialOrders
-    // passed to useState, so no need to set state here
-  }, []);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
 
-  const addToCart = (item: CartItem) => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+    } catch (error) {
+      console.error('Error saving cart:', error);
+    }
+  }, [cartItems]);
+
+  const addToCart = (id: string, name: string, price: number, quantity: number = 1, notes: string = '') => {
+    console.log('addToCart called:', { id, name, price, quantity });
+    
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(i => i.id === item.id);
+      // Check if item already exists
+      const existingItem = prevItems.find(item => item.id === id);
 
       if (existingItem) {
-        return prevItems.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+        // Update quantity
+        return prevItems.map(item =>
+          item.id === id
+            ? { ...item, quantity: item.quantity + quantity, total: (item.quantity + quantity) * item.price }
+            : item
         );
+      } else {
+        // Add new item
+        const newItem: CartItem = {
+          id,
+          name,
+          price,
+          quantity,
+          total: price * quantity,
+          notes,
+        };
+        return [...prevItems, newItem];
       }
-
-      return [...prevItems, item];
     });
   };
 
@@ -80,58 +87,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(id);
-      return;
+    } else {
+      setCartItems(prevItems =>
+        prevItems.map(item =>
+          item.id === id ? { ...item, quantity, total: quantity * item.price } : item
+        )
+      );
     }
-
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
   };
 
   const clearCart = () => {
     setCartItems([]);
   };
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const addOrder = (orderData: Omit<Order, 'id' | 'orderNumber' | 'createdAt' | 'estimatedDelivery'>): Order => {
-    const newOrder: Order = {
-      ...orderData,
-      id: `order_${Date.now()}`,
-      orderNumber: generateOrderNumber(),
-      createdAt: new Date().toISOString(),
-      estimatedDelivery: calculateEstimatedDelivery(),
-    };
-
-    setOrders([newOrder, ...orders]);
-    clearCart();
-    return newOrder;
-  };
-
-  const getOrderById = (id: string): Order | undefined => {
-    return orders.find(order => order.id === id);
+  const getCartTotal = () => {
+    return cartItems.reduce((sum, item) => sum + item.total, 0);
   };
 
   return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        cartCount,
-        cartTotal,
-        orders,
-        addOrder,
-        getOrderById,
-        isCartOpen,
-        setIsCartOpen,
-      }}
-    >
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, cartTotal: getCartTotal() }}>
       {children}
     </CartContext.Provider>
   );

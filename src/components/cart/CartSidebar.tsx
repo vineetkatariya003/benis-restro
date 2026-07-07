@@ -1,285 +1,243 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import Link from 'next/link';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import { useCart } from '@/context/cartContext';
-import { calculateOrderTotal } from '@/data/orders';
-import Image from 'next/image';
-import Link from 'next/link';
 
 export default function CartSidebar() {
-  const { cartItems, removeFromCart, updateQuantity, cartTotal, isCartOpen, setIsCartOpen } = useCart();
-  const { total, tax, delivery, discount } = calculateOrderTotal(cartTotal);
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const [isOpen, setIsOpen] = useState(false);
 
-  if (!isCartOpen) return null;
+  const total = cartItems.reduce((sum, item) => sum + item.total, 0);
 
   return (
     <>
-      {/* Overlay */}
-      <div
-        onClick={() => setIsCartOpen(false)}
+      {/* Cart Icon Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
         style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 998,
+          position: 'relative',
+          backgroundColor: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '24px',
         }}
-      />
-
-      {/* Sidebar */}
-      <div
-      suppressHydrationWarning
-        style={{
-          position: 'fixed',
-          right: 0,
-          top: 0,
-          width: '100%',
-          maxWidth: '400px',
-          height: '100vh',
-          backgroundColor: COLORS.bg.primary,
-          boxShadow: SHADOWS.xl,
-          zIndex: 999,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
+        title="Shopping Cart"
       >
-        {/* Header */}
-        <div
-          style={{
-            padding: SPACING.lg,
-            borderBottom: `1px solid ${COLORS.neutral.gray_200}`,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h2
-            style={{
-              fontSize: TYPOGRAPHY.sizes.lg,
-              fontWeight: TYPOGRAPHY.weights.bold,
-              margin: 0,
-            }}
-          >
-            🛒 Your Cart
-          </h2>
-          <button
-            onClick={() => setIsCartOpen(false)}
-            style={{
-              backgroundColor: 'transparent',
-              border: 'none',
-              fontSize: '24px',
-              cursor: 'pointer',
-            }}
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Items */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: SPACING.lg,
-          }}
-        >
-          {cartItems.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: SPACING['2xl'] }}>
-              <p style={{ fontSize: TYPOGRAPHY.sizes.lg, color: COLORS.text.secondary }}>
-                Your cart is empty
-              </p>
-              <p style={{ fontSize: TYPOGRAPHY.sizes.sm, color: COLORS.text.secondary }}>
-                Add items from the menu to get started!
-              </p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.lg }}>
-              {cartItems.map(item => (
-                <div
-                  key={item.id}
-                  style={{
-                    display: 'flex',
-                    gap: SPACING.md,
-                    padding: SPACING.lg,
-                    backgroundColor: COLORS.bg.secondary,
-                    borderRadius: RADIUS.lg,
-                  }}
-                >
-                  {/* Image */}
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    width={80}
-                    height={80}
-                    style={{
-                      borderRadius: RADIUS.md,
-                      objectFit: 'cover',
-                    }}
-                  />
-
-                  {/* Details */}
-                  <div style={{ flex: 1 }}>
-                    <h3
-                      style={{
-                        fontSize: TYPOGRAPHY.sizes.sm,
-                        fontWeight: TYPOGRAPHY.weights.semibold,
-                        margin: '0 0 4px 0',
-                      }}
-                    >
-                      {item.name}
-                    </h3>
-                    <p
-                      style={{
-                        fontSize: TYPOGRAPHY.sizes.xs,
-                        color: COLORS.text.secondary,
-                        margin: '0 0 8px 0',
-                      }}
-                    >
-                      ₹{item.price}
-                    </p>
-
-                    {/* Quantity Controls */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: SPACING.sm,
-                      }}
-                    >
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        style={{
-                          backgroundColor: COLORS.primary.emerald_light,
-                          border: 'none',
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: RADIUS.sm,
-                          cursor: 'pointer',
-                          fontSize: TYPOGRAPHY.sizes.sm,
-                        }}
-                      >
-                        −
-                      </button>
-                      <span style={{ fontSize: TYPOGRAPHY.sizes.sm, minWidth: '20px', textAlign: 'center' }}>
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        style={{
-                          backgroundColor: COLORS.primary.emerald_light,
-                          border: 'none',
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: RADIUS.sm,
-                          cursor: 'pointer',
-                          fontSize: TYPOGRAPHY.sizes.sm,
-                        }}
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          color: '#dc2626',
-                          cursor: 'pointer',
-                          fontSize: TYPOGRAPHY.sizes.sm,
-                          marginLeft: 'auto',
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Price */}
-                  <div style={{ textAlign: 'right' }}>
-                    <p
-                      style={{
-                        fontSize: TYPOGRAPHY.sizes.sm,
-                        fontWeight: TYPOGRAPHY.weights.semibold,
-                        color: COLORS.primary.emerald,
-                        margin: 0,
-                      }}
-                    >
-                      ₹{item.price * item.quantity}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
+        🛒
         {cartItems.length > 0 && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '-8px',
+              right: '-8px',
+              backgroundColor: COLORS.secondary.gold,
+              color: COLORS.neutral.black,
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              fontWeight: 'bold',
+            }}
+          >
+            {cartItems.length}
+          </span>
+        )}
+      </button>
+
+      {/* Cart Sidebar Panel */}
+      {isOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            right: 0,
+            top: 0,
+            height: '100vh',
+            width: '100%',
+            maxWidth: '400px',
+            backgroundColor: COLORS.bg.primary,
+            boxShadow: SHADOWS.xl,
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            animation: `slideIn 0.3s ease-in-out`,
+          }}
+        >
+          {/* Header */}
           <div
             style={{
               padding: SPACING.lg,
-              borderTop: `1px solid ${COLORS.neutral.gray_200}`,
+              borderBottom: `1px solid ${COLORS.neutral.gray_200}`,
               display: 'flex',
-              flexDirection: 'column',
-              gap: SPACING.md,
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            {/* Totals */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.sm }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: TYPOGRAPHY.sizes.sm }}>
-                <span>Subtotal:</span>
-                <span>₹{cartTotal}</span>
-              </div>
-              {discount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: TYPOGRAPHY.sizes.sm, color: COLORS.primary.emerald }}>
-                  <span>Discount:</span>
-                  <span>-₹{discount}</span>
+            <h2 style={{ fontSize: TYPOGRAPHY.sizes.lg, margin: 0 }}>🛒 Cart</h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+              }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Items */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: SPACING.lg }}>
+            {cartItems.length === 0 ? (
+              <p style={{ color: COLORS.text.secondary, textAlign: 'center' }}>
+                Your cart is empty
+              </p>
+            ) : (
+              cartItems.map(item => (
+                <div
+                  key={item.id}
+                  style={{
+                    padding: SPACING.lg,
+                    borderBottom: `1px solid ${COLORS.neutral.gray_200}`,
+                    marginBottom: SPACING.sm,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginBottom: SPACING.sm,
+                    }}
+                  >
+                    <span style={{ fontWeight: TYPOGRAPHY.weights.semibold }}>
+                      {item.name}
+                    </span>
+                    <span>₹{item.total}</span>
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: SPACING.sm,
+                    }}
+                  >
+                    <button
+                      onClick={() =>
+                        updateQuantity(item.id, Math.max(1, item.quantity - 1))
+                      }
+                      style={{
+                        padding: '4px 8px',
+                        backgroundColor: COLORS.bg.secondary,
+                        border: 'none',
+                        borderRadius: RADIUS.sm,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      −
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      style={{
+                        padding: '4px 8px',
+                        backgroundColor: COLORS.bg.secondary,
+                        border: 'none',
+                        borderRadius: RADIUS.sm,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      style={{
+                        marginLeft: 'auto',
+                        padding: '4px 8px',
+                        backgroundColor: '#FEE2E2',
+                        color: '#991B1B',
+                        border: 'none',
+                        borderRadius: RADIUS.sm,
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: TYPOGRAPHY.sizes.sm }}>
-                <span>Tax (5%):</span>
-                <span>₹{tax}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: TYPOGRAPHY.sizes.sm }}>
-                <span>Delivery:</span>
-                <span>{delivery === 0 ? 'FREE' : `₹${delivery}`}</span>
-              </div>
+              ))
+            )}
+          </div>
+
+          {/* Footer */}
+          {cartItems.length > 0 && (
+            <div
+              style={{
+                padding: SPACING.lg,
+                borderTop: `1px solid ${COLORS.neutral.gray_200}`,
+              }}
+            >
               <div
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  fontSize: TYPOGRAPHY.sizes.base,
+                  marginBottom: SPACING.lg,
+                  fontSize: TYPOGRAPHY.sizes.lg,
                   fontWeight: TYPOGRAPHY.weights.bold,
-                  paddingTop: SPACING.sm,
-                  borderTop: `1px solid ${COLORS.neutral.gray_200}`,
                 }}
               >
                 <span>Total:</span>
-                <span style={{ color: COLORS.primary.emerald }}>₹{total}</span>
+                <span>₹{total}</span>
               </div>
+              <Link href="/checkout" style={{ textDecoration: 'none' }}>
+                <button
+                  style={{
+                    width: '100%',
+                    padding: SPACING.lg,
+                    backgroundColor: COLORS.primary.emerald,
+                    color: COLORS.text.inverse,
+                    border: 'none',
+                    borderRadius: RADIUS.md,
+                    cursor: 'pointer',
+                    fontWeight: TYPOGRAPHY.weights.semibold,
+                  }}
+                >
+                  Proceed to Checkout
+                </button>
+              </Link>
             </div>
+          )}
+        </div>
+      )}
 
-            {/* Checkout Button */}
-            <Link href="/checkout" style={{ textDecoration: 'none' }}>
-              <button
-                style={{
-                  width: '100%',
-                  backgroundColor: COLORS.primary.emerald,
-                  color: COLORS.text.inverse,
-                  padding: SPACING.lg,
-                  borderRadius: RADIUS.md,
-                  border: 'none',
-                  fontSize: TYPOGRAPHY.sizes.base,
-                  fontWeight: TYPOGRAPHY.weights.semibold,
-                  cursor: 'pointer',
-                }}
-              >
-                Proceed to Checkout
-              </button>
-            </Link>
-          </div>
-        )}
-      </div>
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
+          }}
+        />
+      )}
+
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </>
   );
 }

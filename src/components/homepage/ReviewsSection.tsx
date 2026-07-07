@@ -1,7 +1,8 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import { CUSTOMER_REVIEWS, STATISTICS } from '@/data/reviews';
 
 interface ReviewCardProps {
@@ -27,7 +28,7 @@ function ReviewCard({ author, avatar, rating, date, text, dish, index = 0 }: Rev
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
-        transition: `all ${TRANSITIONS.slow}`,
+        transition: `all ${'0.3s'}`,
       }}
     >
       <div
@@ -36,7 +37,7 @@ function ReviewCard({ author, avatar, rating, date, text, dish, index = 0 }: Rev
           borderRadius: RADIUS.xl,
           padding: SPACING.lg,
           boxShadow: SHADOWS.md,
-          transition: `all ${TRANSITIONS.base}`,
+          transition: `all ${'0.3s'}`,
           border: `1px solid ${COLORS.neutral.gray_200}`,
           height: '100%',
           display: 'flex',
@@ -185,7 +186,7 @@ useEffect(() => {
                 borderRadius: RADIUS.lg,
                 textAlign: 'center',
                 cursor: 'pointer',
-                transition: `all ${TRANSITIONS.base}`,
+                transition: `all ${'0.3s'}`,
                 border: selectedStat === idx ? `2px solid ${COLORS.primary.emerald}` : `1px solid ${COLORS.neutral.gray_200}`,
                 boxShadow: selectedStat === idx ? SHADOWS.lg : SHADOWS.sm,
                 transform: selectedStat === idx ? 'scale(1.05)' : 'scale(1)',
@@ -297,7 +298,7 @@ useEffect(() => {
             textAlign: 'center',
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
-            transition: `all ${TRANSITIONS.slow} 500ms`,
+            transition: `all ${'0.3s'} 500ms`,
           }}
         >
           <p
@@ -320,7 +321,7 @@ useEffect(() => {
                 fontSize: TYPOGRAPHY.sizes.base,
                 fontWeight: TYPOGRAPHY.weights.semibold,
                 cursor: 'pointer',
-                transition: `all ${TRANSITIONS.base}`,
+                transition: `all ${'0.3s'}`,
                 boxShadow: SHADOWS.lg,
               }}
               onMouseEnter={(e) => {

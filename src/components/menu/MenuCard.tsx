@@ -3,9 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
-import { useCart } from '@/context/cartContext';
-import type { CartItem } from '@/data/orders';
-
 export interface MenuCardProps {
   index?: number;
   id: string;
@@ -32,21 +29,14 @@ export default function MenuCard({
   isSpecial = false,
   preparationTime = 15,
   servings = 'Serves 1',
+  onAddToCart,
 }: MenuCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    const cartItem: CartItem = {
-      id,
-      name,
-      price,
-      quantity,
-      image,
-      category,
-    };
-    addToCart(cartItem);
+    const total = price * quantity;
+    onAddToCart(id, name, total);
     alert(`${name} x${quantity} added to cart!`);
     setQuantity(1);
   };
@@ -137,6 +127,30 @@ export default function MenuCard({
         >
           {name}
         </h3>
+
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: SPACING.xs,
+            marginBottom: SPACING.sm,
+          }}
+        >
+          <span
+            style={{
+              backgroundColor: COLORS.primary.emerald,
+              color: COLORS.text.inverse,
+              padding: `${SPACING.xs} ${SPACING.sm}`,
+              borderRadius: RADIUS.full,
+              fontSize: TYPOGRAPHY.sizes.xs,
+              fontWeight: TYPOGRAPHY.weights.bold,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            {category}
+          </span>
+        </div>
 
         <p
           style={{
@@ -230,6 +244,25 @@ export default function MenuCard({
             }}
           >
             🛒 Add
+            <button
+  onClick={() => {
+    console.log('Button clicked!', id, name, price);
+    onAddToCart(id, name, price);
+  }}
+  style={{
+    width: '100%',
+    padding: SPACING.lg,
+    backgroundColor: COLORS.primary.emerald,
+    color: COLORS.text.inverse,
+    border: 'none',
+    borderRadius: RADIUS.md,
+    cursor: 'pointer',
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    transition: `all 0.3s`,
+  }}
+>
+  ➕ Add to Cart
+</button>
           </button>
         </div>
       </div>

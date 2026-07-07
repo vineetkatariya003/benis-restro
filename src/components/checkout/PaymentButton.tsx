@@ -1,39 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import { PAYMENT_METHODS } from '@/data/razorpay';
 
-interface RazorpayPaymentResponse {
-  razorpay_payment_id: string;
-  razorpay_order_id?: string;
-  razorpay_signature?: string;
-}
-
-interface RazorpayOptions {
-  key: string;
-  amount: number;
-  currency: string;
-  order_id: string;
-  name: string;
-  description: string;
-  prefill: {
-    name: string;
-    email: string;
-    contact: string;
-  };
-  theme: {
-    color: string;
-  };
-  handler: (response: RazorpayPaymentResponse) => void;
-  modal: {
-    ondismiss: () => void;
-  };
-}
-
-interface RazorpayInstance {
-  open: () => void;
-}
+const TRANSITIONS = {
+  base: '0.3s ease-in-out',
+};
 
 interface PaymentButtonProps {
   amount: number;
@@ -46,10 +19,36 @@ interface PaymentButtonProps {
 }
 
 declare global {
-  interface Window {
-    Razorpay: {
-      new (options: RazorpayOptions): RazorpayInstance;
+  interface RazorpayOptions {
+    key: string;
+    amount: number;
+    currency?: string;
+    name?: string;
+    description?: string;
+    prefill?: {
+      name?: string;
+      email?: string;
+      contact?: string;
     };
+    theme?: {
+      color?: string;
+    };
+    handler?: (response: { razorpay_payment_id: string }) => void;
+    modal?: {
+      ondismiss?: () => void;
+    };
+  }
+
+  interface RazorpayInstance {
+    open: () => void;
+  }
+
+  interface RazorpayStatic {
+    new (options: RazorpayOptions): RazorpayInstance;
+  }
+
+  interface Window {
+    Razorpay?: RazorpayStatic;
   }
 }
 
@@ -64,16 +63,23 @@ export default function PaymentButton({
 }: PaymentButtonProps) {
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
   // Load Razorpay script
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
+    script.onload = () => {
+      console.log('✅ Razorpay script loaded');
+      setScriptLoaded(true);
+    };
     script.onerror = () => {
-      console.warn('Razorpay script failed to load, using demo mode');
+      console.error('❌ Failed to load Razorpay script');
+      setScriptLoaded(false);
     };
     document.body.appendChild(script);
+
     return () => {
       if (document.body.contains(script)) {
         document.body.removeChild(script);
@@ -87,67 +93,63 @@ export default function PaymentButton({
       return;
     }
 
+    if (!scriptLoaded || !window.Razorpay) {
+      alert('Payment gateway is loading. Please wait...');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Check if Razorpay is available
-      if (window.Razorpay) {
-        // REAL RAZORPAY PAYMENT
-        console.log('💳 Attempting real Razorpay payment...');
-        
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_T8KuhbYfKrJ32W',
-          amount: Math.round(amount * 100), // Convert to paise
-          currency: 'INR',
-          order_id: `order_${Date.now()}`,
-          name: 'Benis Restro',
-          description: `Order #${orderId}`,
-          prefill: {
-            name: customerName,
-            email: customerEmail,
-            contact: customerPhone,
-          },
-          theme: {
-            color: '#10B981',
-          },
-          handler: (response: { razorpay_payment_id: string }) => {
-            console.log('✅ Payment successful!', response);
-            alert(
-              `✓ PAYMENT SUCCESSFUL!\n\nPayment ID: ${response.razorpay_payment_id}\nOrder: ${orderId}\n\nThank you for your order!`
-            );
-            onPaymentSuccess(response.razorpay_payment_id);
-            setLoading(false);
-          },
-          modal: {
-            ondismiss: () => {
-              console.log('Payment cancelled');
-              alert('Payment cancelled');
-              onPaymentFailed();
-              setLoading(false);
-            },
-          },
-        };
-
-        const razorpay = new window.Razorpay(options);
-        razorpay.open();
-      } else {
-        // DEMO MODE FALLBACK
-        console.log('💾 Using demo mode...');
-        
-        const demoPaymentId = `pay_demo_${Date.now()}`;
-        
-        // Simulate payment processing
-        setTimeout(() => {
-          alert(
-            `✓ PAYMENT SUCCESSFUL (DEMO MODE)!\n\nPayment ID: ${demoPaymentId}\nOrder: ${orderId}\nAmount: ₹${amount}\n\nNote: This is demo mode. Use Razorpay for real payments.`
-          );
-          onPaymentSuccess(demoPaymentId);
-          setLoading(false);
-        }, 1500);
+      const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      
+      if (!keyId) {
+        alert('❌ Razorpay key is not configured');
+        setLoading(false);
+        return;
       }
+
+      console.log('💳 Opening Razorpay checkout...');
+      console.log('Key ID:', keyId);
+
+      const options = {
+        key: keyId,
+        amount: Math.round(amount * 100), // Convert to paise
+        currency: 'INR',
+        name: 'Benis Restro',
+        description: `Order #${orderId}`,
+        prefill: {
+          name: customerName,
+          email: customerEmail,
+          contact: customerPhone,
+        },
+        theme: {
+          color: '#10B981',
+        },
+       handler: function (response: { razorpay_payment_id: string }) {
+  console.log('✅ Payment successful!');
+  console.log('Payment ID:', response.razorpay_payment_id);
+  
+  alert(`✅ PAYMENT SUCCESSFUL!\n\nPayment ID: ${response.razorpay_payment_id}\nOrder: ${orderId}\n\nThank you for your order!`);
+  
+  onPaymentSuccess(response.razorpay_payment_id);
+  setLoading(false);
+},
+        modal: {
+         ondismiss: function () {
+  console.log('❌ Payment cancelled by user');
+  alert('Payment cancelled');
+  onPaymentFailed();
+  setLoading(false);
+}, 
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
-      console.error('Payment error:', error);
-      alert(`Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ Payment error:', error);
+      alert(`❌ Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       onPaymentFailed();
       setLoading(false);
     }
@@ -173,10 +175,11 @@ export default function PaymentButton({
         💳 Select Payment Method
       </h3>
 
+      {/* Payment Methods */}
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
           gap: SPACING.lg,
           marginBottom: SPACING['2xl'],
         }}
@@ -217,9 +220,10 @@ export default function PaymentButton({
         ))}
       </div>
 
+      {/* Pay Button */}
       <button
         onClick={handlePayment}
-        disabled={!selectedMethod || loading}
+        disabled={!selectedMethod || loading || !scriptLoaded}
         style={{
           width: '100%',
           backgroundColor: COLORS.primary.emerald,
@@ -229,14 +233,19 @@ export default function PaymentButton({
           border: 'none',
           fontSize: TYPOGRAPHY.sizes.base,
           fontWeight: TYPOGRAPHY.weights.semibold,
-          cursor: !selectedMethod || loading ? 'not-allowed' : 'pointer',
-          opacity: !selectedMethod || loading ? 0.5 : 1,
+          cursor: !selectedMethod || loading || !scriptLoaded ? 'not-allowed' : 'pointer',
+          opacity: !selectedMethod || loading || !scriptLoaded ? 0.6 : 1,
           transition: `all ${TRANSITIONS.base}`,
         }}
       >
-        {loading ? '⏳ Processing...' : `💳 Pay ₹${amount}`}
+        {!scriptLoaded
+          ? '⏳ Loading...'
+          : loading
+          ? '⏳ Opening Payment...'
+          : `💳 Pay ₹${amount}`}
       </button>
 
+      {/* Info */}
       <div
         style={{
           marginTop: SPACING.lg,
@@ -248,12 +257,13 @@ export default function PaymentButton({
         }}
       >
         <p style={{ margin: '0 0 8px 0', fontWeight: TYPOGRAPHY.weights.semibold }}>
-          ℹ️ Payment Info:
+          🔐 Real Razorpay Payment
         </p>
         <p style={{ margin: 0 }}>
-          ✓ Real Razorpay integration active<br/>
-          ✓ Falls back to demo mode if unavailable<br/>
-          ✓ Your payment is secure
+          ✓ Powered by Razorpay<br/>
+          ✓ Secure & Fast<br/>
+          ✓ Multiple payment methods<br/>
+          ✓ Real transaction
         </p>
       </div>
     </div>

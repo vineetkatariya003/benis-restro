@@ -1,12 +1,14 @@
 'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
+import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS } from '@/constants/colors';
 import CartIcon from './CartIcon';
-import CartSidebar from '@/components/cart/CartSidebar';
 
-export default function Navbar() {
+const CartSidebar = () => null;
+
+export default function Navbar () {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
@@ -20,18 +22,15 @@ export default function Navbar() {
   return (
     <>
    <nav
-  suppressHydrationWarning
   style={{
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: `${SPACING.lg} ${SPACING.xl}`,
-    backgroundColor: COLORS.bg.primary,
-    boxShadow: SHADOWS.md,
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  }}
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: `${SPACING.md} ${SPACING.lg}`,
+  width: '100%',
+  boxSizing: 'border-box',
+  flexWrap: 'wrap',
+}}
 >
       <div
         style={{
@@ -51,7 +50,7 @@ export default function Navbar() {
       color: COLORS.primary.emerald,
       fontFamily: TYPOGRAPHY.families.display,
       cursor: 'pointer',
-      transition: `color ${TRANSITIONS.fast}`,
+      transition: `color ${'0.3s'}`,
     }}
     onMouseEnter={(e) => (e.currentTarget.style.color = COLORS.primary.emerald_dark)}
     onMouseLeave={(e) => (e.currentTarget.style.color = COLORS.primary.emerald)}
@@ -77,7 +76,7 @@ export default function Navbar() {
                     fontWeight: TYPOGRAPHY.weights.medium,
                     cursor: 'pointer',
                     position: 'relative',
-                    transition: `color ${TRANSITIONS.fast}`,
+                    transition: `color ${'0.3s'}`,
                     paddingBottom: '4px',
                     borderBottom: '2px solid transparent',
                     transitionProperty: 'border-color, color',
@@ -111,7 +110,7 @@ export default function Navbar() {
               fontSize: TYPOGRAPHY.sizes.sm,
               fontWeight: TYPOGRAPHY.weights.semibold,
               cursor: 'pointer',
-              transition: `all ${TRANSITIONS.base}`,
+              transition: `all ${'0.3s'}`,
               boxShadow: SHADOWS.md,
             }}
             onMouseEnter={(e) => {
@@ -151,7 +150,7 @@ export default function Navbar() {
                 height: '3px',
                 backgroundColor: COLORS.primary.emerald,
                 borderRadius: RADIUS.full,
-                transition: `all ${TRANSITIONS.base}`,
+                transition: `all ${'0.3s'}`,
                 transform: isOpen
                   ? i === 1
                     ? 'rotate(45deg) translateY(12px)'
@@ -189,7 +188,7 @@ export default function Navbar() {
                   cursor: 'pointer',
                   padding: `${SPACING.sm} ${SPACING.md}`,
                   borderRadius: RADIUS.md,
-                  transition: `all ${TRANSITIONS.fast}`,
+                  transition: `all ${'0.3s'}`,
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = COLORS.neutral.gray_100;
