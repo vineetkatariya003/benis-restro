@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS } from '@/constants/colors';
 
 interface MenuFiltersProps {
   categories: string[];
@@ -19,122 +18,85 @@ export default function MenuFilters({
   onSearchChange,
 }: MenuFiltersProps) {
   return (
-    <div>
-  {/* Search */}
-<div style={{ marginBottom: SPACING['2xl'] }}>
-  <label
-    style={{
-      display: 'block',
-      fontSize: TYPOGRAPHY.sizes.sm,
-      fontWeight: TYPOGRAPHY.weights.semibold,
-      marginBottom: SPACING.sm,
-    }}
-  >
-    🔍 Search Dishes
-  </label>
-  <input
-    type="text"
-    placeholder="Search..."
-    value={searchTerm}
-    onChange={e => onSearchChange(e.target.value)}
-    style={{
-      width: '100%',
-      padding: SPACING.lg,
-      borderRadius: RADIUS.md,
-      border: `1px solid ${COLORS.neutral.gray_300}`,
-      fontSize: '16px',
-      boxSizing: 'border-box',
-    }}
-  />
-  {searchTerm && (
-    <button
-      onClick={() => onSearchChange('')}
-      style={{
-        marginTop: SPACING.sm,
-        width: '100%',
-        padding: SPACING.sm,
-        backgroundColor: COLORS.bg.secondary,
-        border: 'none',
-        borderRadius: RADIUS.sm,
-        cursor: 'pointer',
-        fontSize: TYPOGRAPHY.sizes.xs,
-      }}
-    >
-      ✕ Clear Search
-    </button>
-  )}
-</div>
+    <div className="menu-v2-filter-content">
 
-      {/* Categories */}
-      <div>
-        <label
-          style={{
-            display: 'block',
-            fontSize: TYPOGRAPHY.sizes.sm,
-            fontWeight: TYPOGRAPHY.weights.semibold,
-            marginBottom: SPACING.sm,
-          }}
-        >
-          📂 Categories
-        </label>
+      {/* SEARCH */}
 
-        {/* All Button */}
+      <div className="menu-v2-search-wrapper">
+        <span className="menu-v2-search-icon">🔍</span>
+
+        <input
+          className="menu-v2-search-input"
+          type="search"
+          placeholder="Search dishes..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+
+        {searchTerm && (
+          <button
+            className="menu-v2-search-clear"
+            onClick={() => onSearchChange('')}
+            type="button"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {/* CATEGORIES */}
+
+      <div className="menu-v2-category-scroll">
+
         <button
+          type="button"
+          className={`menu-v2-category-card ${
+            selectedCategory === null
+              ? 'menu-v2-category-active'
+              : ''
+          }`}
           onClick={() => onCategoryChange(null)}
-          style={{
-            width: '100%',
-            padding: SPACING.lg,
-            marginBottom: SPACING.sm,
-            backgroundColor: !selectedCategory ? COLORS.primary.emerald : COLORS.bg.secondary,
-            color: !selectedCategory ? COLORS.text.inverse : COLORS.neutral.black,
-            border: 'none',
-            borderRadius: RADIUS.md,
-            cursor: 'pointer',
-            fontWeight: TYPOGRAPHY.weights.semibold,
-            transition: 'all 0.3s',
-          }}
         >
-          ✓ All Items
+          <span className="menu-v2-category-status">
+            ALL
+          </span>
+
+          <span className="menu-v2-category-icon">
+            🍽️
+          </span>
+
+          <strong>All Items</strong>
+
+          <small>All dishes</small>
         </button>
 
-        {/* Category Buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: SPACING.sm }}>
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => onCategoryChange(category)}
-              style={{
-                padding: SPACING.lg,
-                backgroundColor:
-                  selectedCategory === category
-                    ? COLORS.primary.emerald
-                    : COLORS.bg.secondary,
-                color:
-                  selectedCategory === category
-                    ? COLORS.text.inverse
-                    : COLORS.neutral.black,
-                border: 'none',
-                borderRadius: RADIUS.md,
-                cursor: 'pointer',
-                fontWeight: TYPOGRAPHY.weights.semibold,
-                textAlign: 'left',
-                transition: 'all 0.3s',
-              }}
-              onMouseEnter={e => {
-                if (selectedCategory !== category) {
-                  e.currentTarget.style.backgroundColor = COLORS.primary.emerald_light;
-                }
-              }}
-              onMouseLeave={e => {
-                if (selectedCategory !== category) {
-                  e.currentTarget.style.backgroundColor = COLORS.bg.secondary;
-                }
-              }}
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
-          ))}
-        </div>
+        {categories.map((category) => (
+          <button
+            key={category}
+            type="button"
+            className={`menu-v2-category-card ${
+              selectedCategory === category
+                ? 'menu-v2-category-active'
+                : ''
+            }`}
+            onClick={() =>
+              onCategoryChange(category)
+            }
+          >
+            <span className="menu-v2-category-status">
+              Available
+            </span>
+
+            <span className="menu-v2-category-icon">
+              🍴
+            </span>
+
+            <strong>{category}</strong>
+
+            <small>View dishes</small>
+          </button>
+        ))}
+
       </div>
     </div>
   );

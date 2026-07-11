@@ -10,9 +10,9 @@ export const metadata = {
 export default function Contact() {
   return (
     <>
-      <Navbar />
+      
       <ContactPage />
-      <Footer />
+    
     </>
   );
 }

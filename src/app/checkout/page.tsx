@@ -10,9 +10,9 @@ export const metadata = {
 export default function Checkout() {
   return (
     <>
-      <Navbar />
+
       <CheckoutPage />
-      <Footer />
+  
     </>
   );
 }

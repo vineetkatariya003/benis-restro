@@ -10,7 +10,7 @@ description: 'Reserve a table at Benis Restro for an unforgettable dining experi
 export default function BookingPage() {
   return (
     <div>
-      <Navbar />
+    
       
       <div
         style={{
@@ -47,7 +47,7 @@ export default function BookingPage() {
         </div>
       </div>
 
-      <Footer />
+  
     </div>
   );
 }

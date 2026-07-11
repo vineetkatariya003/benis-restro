@@ -10,9 +10,8 @@ export const metadata = {
 export default function GalleryPage() {
   return (
     <>
-      <Navbar />
       <GalleryPageComponent />
-      <Footer />
+    
     </>
   );
 }

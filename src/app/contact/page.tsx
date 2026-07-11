@@ -10,9 +10,8 @@ description: 'Get in touch with Benis Restro. Call, email, or visit us for any i
 export default function ContactPage() {
   return (
     <>
-      <Navbar />
       <ContactPageComponent />
-      <Footer />
+    
     </>
   );
 }

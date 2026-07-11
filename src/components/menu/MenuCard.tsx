@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { COLORS, TYPOGRAPHY, SPACING, RADIUS, SHADOWS, TRANSITIONS } from '@/constants/colors';
+
 export interface MenuCardProps {
   index?: number;
   id: string;
@@ -15,7 +15,13 @@ export interface MenuCardProps {
   isSpecial?: boolean;
   preparationTime?: number;
   servings?: string;
-  onAddToCart: (id: string, name: string, total: number) => void;
+
+  onAddToCart: (
+    id: string,
+    name: string,
+    price: number,
+    quantity: number
+  ) => void;
 }
 
 export default function MenuCard({
@@ -31,240 +37,123 @@ export default function MenuCard({
   servings = 'Serves 1',
   onAddToCart,
 }: MenuCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
 
   const handleAddToCart = () => {
-    const total = price * quantity;
-    onAddToCart(id, name, total);
-    alert(`${name} x${quantity} added to cart!`);
+    // Send UNIT PRICE and SELECTED QUANTITY separately.
+    onAddToCart(id, name, price, quantity);
+
+    setAdded(true);
     setQuantity(1);
+
+    window.setTimeout(() => {
+      setAdded(false);
+    }, 1200);
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: COLORS.bg.primary,
-        borderRadius: RADIUS.lg,
-        overflow: 'hidden',
-        boxShadow: SHADOWS.md,
-        transition: `all ${TRANSITIONS.base}`,
-        transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Image Container */}
-      <div
-        style={{
-          position: 'relative',
-          overflow: 'hidden',
-          height: '240px',
-        }}
-      >
+    <article className="menu-v2-card">
+      {/* IMAGE AREA */}
+
+      <div className="menu-v2-card-image-wrapper">
         <Image
           src={image}
           alt={name}
           fill
-          style={{
-            objectFit: 'cover',
-            transition: `transform ${TRANSITIONS.base}`,
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-          }}
+          className="menu-v2-card-image"
+          sizes="
+            (max-width: 640px) 50vw,
+            (max-width: 1024px) 33vw,
+            20vw
+          "
         />
 
-        {/* Badges */}
-        <div
-          style={{
-            position: 'absolute',
-            top: SPACING.md,
-            right: SPACING.md,
-            display: 'flex',
-            gap: SPACING.sm,
-            flexWrap: 'wrap',
-          }}
-        >
-          {isFeatured && (
-            <span
-              style={{
-                backgroundColor: COLORS.primary.emerald,
-                color: COLORS.text.inverse,
-                padding: `${SPACING.xs} ${SPACING.sm}`,
-                borderRadius: RADIUS.full,
-                fontSize: TYPOGRAPHY.sizes.xs,
-                fontWeight: TYPOGRAPHY.weights.bold,
-              }}
-            >
-              ⭐ Featured
-            </span>
-          )}
-          {isSpecial && (
-            <span
-              style={{
-                backgroundColor: COLORS.secondary.gold,
-                color: COLORS.text.inverse,
-                padding: `${SPACING.xs} ${SPACING.sm}`,
-                borderRadius: RADIUS.full,
-                fontSize: TYPOGRAPHY.sizes.xs,
-                fontWeight: TYPOGRAPHY.weights.bold,
-              }}
-            >
-              🔥 Special
-            </span>
-          )}
-        </div>
+        {(isFeatured || isSpecial) && (
+          <div className="menu-v2-card-badges">
+            {isFeatured && (
+              <span className="menu-v2-badge">
+                Bestseller
+              </span>
+            )}
+
+            {isSpecial && (
+              <span className="menu-v2-badge menu-v2-badge-special">
+                Chef&apos;s Special
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      <div style={{ padding: SPACING.lg }}>
-        <h3
-          style={{
-            fontSize: TYPOGRAPHY.sizes.lg,
-            fontWeight: TYPOGRAPHY.weights.bold,
-            color: COLORS.neutral.black,
-            margin: '0 0 8px 0',
-          }}
-        >
-          {name}
-        </h3>
+      {/* CARD CONTENT */}
 
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: SPACING.xs,
-            marginBottom: SPACING.sm,
-          }}
-        >
-          <span
-            style={{
-              backgroundColor: COLORS.primary.emerald,
-              color: COLORS.text.inverse,
-              padding: `${SPACING.xs} ${SPACING.sm}`,
-              borderRadius: RADIUS.full,
-              fontSize: TYPOGRAPHY.sizes.xs,
-              fontWeight: TYPOGRAPHY.weights.bold,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
-            {category}
+      <div className="menu-v2-card-content">
+        <div className="menu-v2-card-top">
+          <div>
+            <h3 className="menu-v2-card-name">
+              {name}
+            </h3>
+
+            <span className="menu-v2-card-category">
+              {category}
+            </span>
+          </div>
+
+          <span className="menu-v2-card-price">
+            ₹{price}
           </span>
         </div>
 
-        <p
-          style={{
-            fontSize: TYPOGRAPHY.sizes.sm,
-            color: COLORS.text.secondary,
-            lineHeight: 1.5,
-            margin: '0 0 12px 0',
-          }}
-        >
+        <p className="menu-v2-card-description">
           {description}
         </p>
 
-        {/* Prep Time & Servings */}
-        <div
-          style={{
-            display: 'flex',
-            gap: SPACING.md,
-            fontSize: TYPOGRAPHY.sizes.xs,
-            color: COLORS.text.secondary,
-            marginBottom: SPACING.lg,
-          }}
-        >
-          <span>⏱️ {preparationTime} mins</span>
-          <span>🍽️ {servings}</span>
+        <div className="menu-v2-card-meta">
+          <span>⏱ {preparationTime} min</span>
+          <span>🍽 {servings}</span>
         </div>
 
-        {/* Price */}
-        <div
-          style={{
-            fontSize: TYPOGRAPHY.sizes['2xl'],
-            fontWeight: TYPOGRAPHY.weights.bold,
-            color: COLORS.primary.emerald,
-            marginBottom: SPACING.lg,
-          }}
-        >
-          ₹{price}
-        </div>
+        {/* QUANTITY + ADD */}
 
-        {/* Quantity & Add to Cart */}
-        <div style={{ display: 'flex', gap: SPACING.md, alignItems: 'center' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              border: `1px solid ${COLORS.neutral.gray_300}`,
-              borderRadius: RADIUS.md,
-            }}
-          >
+        <div className="menu-v2-card-actions">
+          <div className="menu-v2-quantity">
             <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                padding: `${SPACING.sm} ${SPACING.md}`,
-                cursor: 'pointer',
-                fontSize: TYPOGRAPHY.sizes.lg,
-              }}
+              type="button"
+              aria-label={`Decrease quantity of ${name}`}
+              onClick={() =>
+                setQuantity((current) =>
+                  Math.max(1, current - 1)
+                )
+              }
             >
               −
             </button>
-            <span style={{ padding: `0 ${SPACING.md}`, minWidth: '30px', textAlign: 'center' }}>
-              {quantity}
-            </span>
+
+            <span>{quantity}</span>
+
             <button
-              onClick={() => setQuantity(quantity + 1)}
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-                padding: `${SPACING.sm} ${SPACING.md}`,
-                cursor: 'pointer',
-                fontSize: TYPOGRAPHY.sizes.lg,
-              }}
+              type="button"
+              aria-label={`Increase quantity of ${name}`}
+              onClick={() =>
+                setQuantity((current) => current + 1)
+              }
             >
               +
             </button>
           </div>
 
           <button
+            type="button"
+            className={`menu-v2-add-button ${
+              added ? 'menu-v2-add-button-success' : ''
+            }`}
             onClick={handleAddToCart}
-            style={{
-              flex: 1,
-              backgroundColor: COLORS.primary.emerald,
-              color: COLORS.text.inverse,
-              padding: SPACING.md,
-              borderRadius: RADIUS.md,
-              border: 'none',
-              fontSize: TYPOGRAPHY.sizes.sm,
-              fontWeight: TYPOGRAPHY.weights.semibold,
-              cursor: 'pointer',
-              transition: `all ${TRANSITIONS.base}`,
-            }}
           >
-            🛒 Add
-            <button
-  onClick={() => {
-    console.log('Button clicked!', id, name, price);
-    onAddToCart(id, name, price);
-  }}
-  style={{
-    width: '10%',
-    padding: SPACING.lg,
-    backgroundColor: COLORS.primary.emerald,
-    color: COLORS.text.inverse,
-    border: 'none',
-    borderRadius: RADIUS.md,
-    cursor: 'pointer',
-    fontWeight: TYPOGRAPHY.weights.semibold,
-    transition: `all 0.3s`,
-  }}
->
-</button>
+            {added ? '✓ Added' : '+ Add'}
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

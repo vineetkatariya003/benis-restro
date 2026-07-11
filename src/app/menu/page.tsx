@@ -10,9 +10,8 @@ export const metadata = {
 export default function MenuPage() {
   return (
     <>
-      <Navbar />
       <MenuPageComponent />
-      <Footer />
+    
     </>
   );
 }

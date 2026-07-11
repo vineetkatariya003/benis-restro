@@ -29,7 +29,7 @@ export default function OrdersPage() {
 
   return (
     <>
-      <Navbar />
+    
       <div style={{ padding: `${SPACING['4xl']} ${SPACING.xl}`, backgroundColor: COLORS.bg.secondary, minHeight: '100vh' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: TYPOGRAPHY.weights.bold, marginBottom: SPACING['2xl'], margin: '0 0 32px 0' }}>
@@ -129,7 +129,7 @@ export default function OrdersPage() {
           )}
         </div>
       </div>
-      <Footer />
+    
     </>
   );
 }

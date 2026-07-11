@@ -13,11 +13,11 @@ description: 'Experience exceptional vegetarian cuisine at Benis Restro. Reserve
 export default function Home() {
   return (
     <div>
-      <Navbar />
+  
       <HeroSection />
       <FeaturedDishes />
       <ReviewsSection />
-      <Footer />
+    
     </div>
   );
 }
